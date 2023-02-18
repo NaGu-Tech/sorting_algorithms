@@ -1,92 +1,46 @@
 #include "sort.h"
 /**
- * swap_backward -swap two nodes right left position
- * @c: list
- *
- **/
-void swap_backward(listint_t *c)
-{
-	listint_t *tmp, *head;
-
-	while (c->prev != NULL)
-	{
-		if (c->n < c->prev->n)
-		{
-			tmp = c->prev->prev;
-			c->prev->next = c->next;
-			c->next = c->prev;
-			c->prev->prev = c;
-			c->prev = tmp;
-			c->next->next->prev = c->next;
-			if (tmp != NULL)
-				tmp->next = c;
-			head = c;
-			while (head->prev != NULL)
-				head = head->prev;
-			print_list(head);
-		}
-		else
-			c = c->prev;
-	}
-}
-/**
- * swap_forward -swap two nodes left rigth position
- * @c: list
- *
- **/
-void swap_forward(listint_t *c)
-{
-	listint_t *tmp, *head;
-
-	tmp = c->prev;
-
-	if (tmp != NULL)
-	{
-		tmp->next = c->next;
-		c->next->prev = tmp;
-	}
-	else
-		c->next->prev = NULL;
-	c->prev = c->next;
-	if (c->next->next != NULL)
-	{
-		c->next = c->next->next;
-		c->prev->next = c;
-		c->next->prev = c;
-	}
-	else
-	{
-		c->next->next = c;
-		c->next = NULL;
-	}
-	head = c;
-	while (head->prev != NULL)
-		head = head->prev;
-	print_list(head);
-	swap_backward(c->prev);
-}
-/**
- * insertion_sort_list -sort a doubly linked list with insert algorithm
- * @list: list
- *
- **/
+ * insertion_sort_list - function that sorts a doubly linked list
+ * of integers in ascending order using the Insertion sort algorithm
+ * @list: Dobule linked list to sort
+ */
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *c;
+	listint_t *node;
 
-	if ((list == NULL) || (*list == NULL) || ((*list)->next == NULL))
+	if (list == NULL || (*list)->next == NULL)
 		return;
-	c = *list;
-
-	while (c->next != NULL)
+	node = (*list)->next;
+	while (node)
 	{
-		if (c->n > c->next->n)
+		while ((node->prev) && (node->prev->n > node->n))
 		{
-			swap_forward(c);
+			node = swap_node(node, list);
+			print_list(*list);
 		}
-		else
-			c = c->next;
+		node = node->next;
 	}
-	while ((*list)->prev != NULL)
-		*list = (*list)->prev;
+}
+/**
+ *swap_node - swap a node for his previous one
+ *@node: node
+ *@list: node list
+ *Return: return a pointer to a node which was enter it
+ */
+listint_t *swap_node(listint_t *node, listint_t **list)
+{
+	listint_t *back = node->prev, *current = node;
+	/*NULL, 19, 48, 9, 71, 13, NULL*/
+
+	back->next = current->next;
+	if (current->next)
+		current->next->prev = back;
+	current->next = back;
+	current->prev = back->prev;
+	back->prev = current;
+	if (current->prev)
+		current->prev->next = current;
+	else
+		*list = current;
+	return (current);
 }
